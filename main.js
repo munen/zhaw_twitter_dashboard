@@ -8,10 +8,12 @@ app = express(),
 Twitter = require('twitter'),
 secrets = require('./secrets');
 
+app.use(express.static(__dirname + '/public'));
+
 // Setup
 app.use(morgan('dev'));
 var jsonParser = bodyParser.json()
-var client = new Twitter({
+var twitter_client = new Twitter({
     consumer_key: secrets.consumer_key,
     consumer_secret: secrets.consumer_secret,
     access_token_key: secrets.access_token_key,
@@ -32,7 +34,7 @@ server.listen(8000, function() {
 // END FAYE
 
 var track_keyword = function(keyword, id) {
-    client.stream('statuses/filter', {track: keyword}, function(stream) {
+    twitter_client.stream('statuses/filter', {track: keyword}, function(stream) {
         console.log("Starting to monitor keyword: '" + keyword);
         stream.on('data', function(tweet) {
             //tweet.text
@@ -50,6 +52,7 @@ var track_keyword = function(keyword, id) {
     });
 }
 
+// Twitter limits non-paying customers to two concurrent connections
 var jobs = [
     { keyword: "",
       frequency: 0 },
@@ -57,7 +60,7 @@ var jobs = [
       frequency: 0 }
 ]
 
-app.put('/jobs/:id', jsonParser, function(req, res) {
+app.put('/keyword_monitor_jobs/:id', jsonParser, function(req, res) {
     if (!req.body || (req.params.id > 2 || req.params.id < 1)) return res.sendStatus(400);
 
     var id = req.params.id - 1;
@@ -70,14 +73,19 @@ app.put('/jobs/:id', jsonParser, function(req, res) {
     res.status(201).json({'job': id + 1});
 })
 
+app.get('/twitter_users/:username', function(req, res) {
+    var screen_name = req.params.username
+    twitter_client.get("/users/show", { screen_name: screen_name }, function(error, tweets, response) {
+        console.log(typeof response);
+
+        //res.status(200).json({'follower_count': JSON.parse(response).followers_count});
+        res.status(200).json(JSON.parse(response.body));
+    });
+})
+
 app.listen(8080, function(){
     console.log("http server ready, captain.");
 });
-
-
-
-
-
 
 bayeux.getClient().subscribe('/job_statistics', function(msg) {
     console.log(msg);
