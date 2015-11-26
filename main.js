@@ -47,7 +47,6 @@ var start_tracking = function(keyword, id) {
         stream.on('data', function(tweet) {
             //tweet.text
             var frequency = ++jobs[id].frequency;
-            // console.log(keyword, ": ", frequency);
             bayeux.getClient().publish(`/job_statistics/${id+1}`, {
                 keyword     : keyword,
                 screen_name : tweet.user.screen_name,
@@ -62,6 +61,7 @@ var start_tracking = function(keyword, id) {
             // Possible reasons:
             //  * Exceeded connection limit for user
             //  * Easy there, Turbo. Too many requests recently. Enhance your calm.
+            console.log("ERROR: ");
             console.log(error.source);
         });
     });
