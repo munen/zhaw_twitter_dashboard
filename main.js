@@ -42,13 +42,13 @@ var jobs = [{ keyword: "",
 
 var start_tracking = function(keyword, id) {
     twitter_client.stream('statuses/filter', {track: keyword}, function(stream) {
-        console.log("Starting to monitor keyword: '" + keyword + "' with id '" + id + "'");
+        console.log("Starting to monitor keyword: '" + keyword + "' with id '" + (id +1) + "'");
         jobs[id].stream = stream;
         stream.on('data', function(tweet) {
             //tweet.text
             var frequency = ++jobs[id].frequency;
             // console.log(keyword, ": ", frequency);
-            bayeux.getClient().publish('/job_statistics', {
+            bayeux.getClient().publish(`/job_statistics/${id+1}`, {
                 keyword     : keyword,
                 screen_name : tweet.user.screen_name,
                 tweet_id    : tweet.id_str,

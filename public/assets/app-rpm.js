@@ -1,5 +1,4 @@
 var draw_rpm_chart = function(users) {
-    console.log("rendering");
     var gaugeOptions = {
 
         chart: {
@@ -10,7 +9,6 @@ var draw_rpm_chart = function(users) {
 
         pane: {
             center: ['50%', '85%'],
-            size: '140%',
             startAngle: -90,
             endAngle: 90,
             background: {
@@ -71,7 +69,7 @@ var draw_rpm_chart = function(users) {
 
         series: [{
             name: 'RPM',
-            data: [80],
+            data: [0],
             dataLabels: {
                 format: '<div style="text-align:center"><span style="font-size:25px;color:' +
                     ((Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black') + '">{y}</span><br/>' +
@@ -83,29 +81,14 @@ var draw_rpm_chart = function(users) {
         }]
 
     }));
+};
 
+var update_gauge = function(val) {
+    var chart = $('#gauge-1').highcharts(),
+        point;
 
-    // Bring life to the dials
-    setInterval(function () {
-        // Speed
-        var chart = $('#gauge-1').highcharts(),
-            point,
-            newVal,
-            inc;
-
-        if (chart) {
-            point = chart.series[0].points[0];
-            inc = Math.round((Math.random() - 0.5) * 100);
-            newVal = point.y + inc;
-
-            if (newVal < 0 || newVal > 200) {
-                newVal = point.y - inc;
-            }
-
-            point.update(newVal);
-        }
-
-    }, 2000);
+    point = chart.series[0].points[0];
+    point.update(val);
 };
 
 var show_progress = function(element) {
@@ -124,11 +107,10 @@ var show_progress = function(element) {
     }, 1000);
 };
 
-var start_monitoring_job = function(keyword) {
-
+var start_monitoring_job = function(keyword, id) {
     var settings = {
         "async": true,
-        "url": "/keyword_monitor_jobs/1",
+        "url": `/keyword_monitor_jobs/${id}`,
         "method": "PUT",
         "headers": {"content-type": "application/json" },
         "data": "{\"keyword\":\"" + keyword + "\"}"
@@ -146,16 +128,28 @@ var start_monitoring_job = function(keyword) {
     });
 };
 
+var log_tweet = function(msg, id) {
+    $(`#gauge-${id} + .well ul`).append($('<li>').html(
+        $("<a>")
+            .attr("href", `https://twitter.com/${msg.screen_name}/status/${msg.tweet_id}`)
+            .html(`${msg.frequency}: `)
+            .append($(`<span>${msg.text}</span>`))
+    ));
+};
+
+var calculate_rpm = function(msg) {
+};
+
 var monitor_statistics = function() {
     var client = new Faye.Client('http://localhost:8000/faye');
 
-    client.subscribe('/job_statistics', function(msg) {
-        $(".well ul").append($('<li>').html(
-            $("<a>")
-                .attr("href", `https://twitter.com/${msg.screen_name}/status/${msg.tweet_id}`)
-                .html(`${msg.frequency}: `)
-                .append($(`<span>${msg.text}</span>`))
-        ));
+    client.subscribe('/job_statistics/1', function(msg) {
+        log_tweet(msg, 1);
+        // TODO: calculate_rpm(msg, id)
+    });
+    client.subscribe('/job_statistics/2', function(msg) {
+        log_tweet(msg, 2);
+        // TODO: calculate_rpm(msg, id)
     });
 }
 
@@ -169,6 +163,7 @@ $(function () {
         var val = $(this).parent().find("+input:first").val();
         if(!val) return;
         
-        start_monitoring_job(val);
+        // TODO: Retrieve real ID
+        start_monitoring_job(val, 1);
     });
 });
