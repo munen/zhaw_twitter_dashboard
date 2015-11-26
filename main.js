@@ -49,8 +49,12 @@ var start_tracking = function(keyword, id) {
             var frequency = ++jobs[id].frequency;
             // console.log(keyword, ": ", frequency);
             bayeux.getClient().publish('/job_statistics', {
-                keyword:       keyword,
-                frequency:  frequency
+                keyword     : keyword,
+                screen_name : tweet.user.screen_name,
+                tweet_id    : tweet.id_str,
+                frequency   : frequency,
+                text        : tweet.text,
+                time        : new Date()
             });
         });
 

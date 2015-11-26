@@ -39,12 +39,16 @@ var start_monitoring_job = function(keyword) {
     });
 };
 
-
 var monitor_statistics = function() {
     var client = new Faye.Client('http://localhost:8000/faye');
 
     client.subscribe('/job_statistics', function(msg) {
-        console.log(msg);
+        $(".well ul").append($('<li>').html(
+            $("<a>")
+                .attr("href", `https://twitter.com/${msg.screen_name}/status/${msg.tweet_id}`)
+                .html(`${msg.frequency}: `)
+                .append($(`<span>${msg.text}</span>`))
+        ));
     });
 }
 
@@ -55,6 +59,8 @@ $(function () {
         show_progress(event.target);
         event.preventDefault();
         var val = $(this).parent().find("+input:first").val();
+        if(!val) return;
+        
         start_monitoring_job(val);
     });
 });
