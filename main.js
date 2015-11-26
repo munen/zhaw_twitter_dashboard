@@ -47,7 +47,7 @@ var start_tracking = function(keyword, id) {
         stream.on('data', function(tweet) {
             //tweet.text
             var frequency = ++jobs[id].frequency;
-            console.log(keyword, ": ", frequency);
+            // console.log(keyword, ": ", frequency);
             bayeux.getClient().publish('/job_statistics', {
                 keyword:       keyword,
                 frequency:  frequency
