@@ -1,11 +1,11 @@
 "use strict";
 
 var express = require('express'),
-bodyParser = require('body-parser'),
-morgan = require('morgan'),
-app = express(),
-Twitter = require('twitter'),
-secrets = require('./secrets');
+    bodyParser = require('body-parser'),
+    morgan = require('morgan'),
+    app = express(),
+    Twitter = require('twitter'),
+    secrets = require('./secrets');
 
 app.use(express.static(__dirname + '/public'));
 
