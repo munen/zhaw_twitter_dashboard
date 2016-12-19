@@ -86,7 +86,7 @@ app.put('/keyword_monitor_jobs/:id', jsonParser, function(req, res) {
 
     var id = req.params.id - 1;
     var keyword = req.body.keyword;
-    
+
     jobs[id].keyword = keyword;
 
     track_keyword(keyword, id);
@@ -104,7 +104,7 @@ app.get('/twitter_users/:username', function(req, res) {
     });
 });
 
-app.listen(8080, function(){
+app.listen(3000, function(){
     console.log("http server ready, captain.");
 });
 
