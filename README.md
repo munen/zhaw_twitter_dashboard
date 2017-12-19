@@ -10,9 +10,14 @@ NodeJS application for ZHAW (Zurich University of Applied Sciences) to display a
 * Create Twitter Apps API account at [apps.twitter.com](https://apps.twitter.com)
 * Fill out credentials in `secrets.js` 
 
+## Node Modules
+
+`npm install`
+
 ## Running
 
 * `npm start`
+* Open your browser at `http://localhost:3000`
 
 
 ## Deployment
